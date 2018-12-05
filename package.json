@@ -1,0 +1,17 @@
+{
+  "name": "canvas-projects",
+  "version": "1.0.0",
+  "description": "A bunch of HTML5 canvas projects powered by JavaScript.",
+  "main": "./build/javascripts/boilerplate.js",
+  "scripts": {
+    "app": "webpack-dev-server"
+  },
+  "dependencies": {
+    "eslint": "^5.9.0",
+    "webpack-cli": "^3.1.2",
+    "webpack-dev-server": "^3.1.10",
+    "webpack": "^4.27.0"
+  },
+  "author": "cheeseymeaty",
+  "license": "ISC"
+}

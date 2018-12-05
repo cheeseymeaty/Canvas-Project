@@ -1,0 +1,53 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true,
+		"node": true
+	},
+	"extends": "eslint:recommended",
+	"parserOptions": {
+		"sourceType": "module",
+		"ecmaVersion": 2018
+	},
+	"rules": {
+		"no-constant-condition": 0,
+		"arrow-spacing": "error",
+		"block-spacing": "error",
+		"camelcase": "error",
+		"capitalized-comments": "error",
+		"comma-dangle": "error",
+		"comma-style": "error",
+		"curly": "error",
+		"eqeqeq": "error",
+		"init-declarations": "error",
+		"key-spacing": "error",
+		"new-cap": "error",
+		"no-bitwise": "error",
+		"no-delete-var": "error",
+		"no-duplicate-imports": "error",
+		"no-eq-null": "error",
+		"no-extra-parens": "error",
+		"no-mixed-spaces-and-tabs": "error",
+		"no-multi-spaces": "error",
+		"no-multiple-empty-lines": "error",
+		"no-new": "error",
+		"no-new-func": "error",
+		"no-new-object": "error",
+		"no-new-wrappers": "error",
+		"no-new-symbol": "error",
+		"no-self-assign": "error",
+		"no-self-compare": "error",
+		"no-sequences": "error",
+		"no-trailing-spaces": "error",
+		"no-undefined": "error",
+		"no-underscore-dangle": "error",
+		"no-use-before-define": "error",
+		"no-var": "error",
+		"spaced-comment": "error",
+		"indent": [ "error", "tab" ],
+		"linebreak-style": [ "error", "windows" ],
+		"quotes": [ "error", "single" ],
+		"semi": [ "error", "always" ]
+	}
+}
