@@ -18,7 +18,7 @@ onresize = () => {
 };
 
 onload = () => {
-	document.title = 'boilerplate'
+	document.title = 'boilerplate';
 	onresize();
 	animate();
 };
