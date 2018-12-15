@@ -12,6 +12,7 @@ After the server is done compiling, go to the `http://localhost:8080/build/` to 
 ## Info & Stuff
 - This repository first started on December 3rd, 2018 (2018/12/3).
 - The lists of projects are in a folder which you can find all at `./build/javascripts`.
+- You can read each of the projects' descriptions and infos on it by going into the localhost's console (F12) or through the JS files.
 - I'm a **hobbyist**. Please, don't hurt me.
 
 \- cheeseymeaty
