@@ -8,6 +8,8 @@ const settings = {};
 
 const keyboard = {};
 
+const mouse = { x: null, y: null };
+
 // < Animation >
 function animate() {
 	requestAnimationFrame(animate);
@@ -16,6 +18,10 @@ function animate() {
 }
 
 // < Events >
+onmousemove = E => {
+	[mouse.x, mouse.y] = [E.x, E.y];
+};
+
 onkeydown = E => {
 	// Switch case for key presses
 	switch (E.code) {
