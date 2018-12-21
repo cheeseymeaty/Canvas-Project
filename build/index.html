@@ -6,7 +6,12 @@
 		<title>Canvas Project</title>
 	</head>
 	<body>
-		<canvas></canvas>
-		<script src="bundle.js"></script>
+		<script>
+			const name = new URLSearchParams(location.search).get('project');
+			const script = document.createElement('script');
+			script.src = `dist/${name || 'home'}.js`;
+			if (name) { document.body.appendChild(document.createElement('canvas')); }
+			document.body.appendChild(script);
+		</script>
 	</body>
 </html>
