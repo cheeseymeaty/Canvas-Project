@@ -1,4 +1,4 @@
-const PROJECTS = ['Chaos-Game-Triangle', 'Graphing-Calculator', 'Monges-Theorem', 'Vivianis-Theorem'];
+const PROJECTS = ['Chaos-Game-Triangle', 'Graphing-Calculator', 'Monges-Theorem', 'Ptolemys-Theorem', 'Vivianis-Theorem'];
 
 // STOP
 import $ from 'jquery';
