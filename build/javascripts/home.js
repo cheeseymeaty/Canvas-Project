@@ -13,5 +13,5 @@ $('<p>Projects:<p>').appendTo(document.body);
 $('<ol id="list"></ol>').appendTo(document.body);
 
 for (const name of PROJECTS) {
-	$(`<li><a href="http://localhost:8080/build/?project=${name}">${name}</a></li>`).appendTo($('#list'));
+	$(`<li><a href="http://localhost:8080/build/?project=${name}">${name.replace(/-/g, ' ')}</a></li>`).appendTo($('#list'));
 }
