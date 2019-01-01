@@ -10,7 +10,6 @@ const settings = {
 
 		text: {
 			outline: 3,
-			miterLimit: 3,
 			space: 10,
 			font: '20px "Roboto Mono"'
 		},
@@ -305,7 +304,6 @@ onresize = function() {
 	C.font = settings.style.text.font;
 	C.textBaseline = 'middle';
 	C.textAlign = 'right';
-	C.miterLimit = settings.style.text.miterLimit;
 };
 
 onload = () => {

@@ -53,30 +53,22 @@ const settings = {
 		}
 	},
 
-	// The friction of the graph's velocity
-	friction: 0.9,
+	mouseEase: 10,
 
 	// How smooth each line is depending on the zoom
 	// / Lower the number at your own risk! Can cause lag on weak computers if there's a lot of functions
 	lineSmoothness: 0.5,
 
-	// How far the zoom can go out
+	friction: 0.9,
 	zoomLimit: 2,
-
-	// How smooth the zooming process is
 	zoomEase: 5,
-
-	// How smooth the mouse and dots are
-	mouseEase: 10,
-
-	// How many decimal places the displayed numbers go out to
+	zoomSpeed: 0.05,
 	decimalLength: 3
 };
 
 const mouse = {
 	real: { x: null, y: null },
 	smooth: { x: null, y: null },
-	previous: { x: null, y: null },
 	velocity: { x: 0, y: 0 },
 	down: false
 };
@@ -115,6 +107,7 @@ const graph = {
 		}
 	},
 
+	// The coordinates of the graph's origin going out from the center of the canvas
 	get x() {
 		return width/2+graph.origin.smooth.x;
 	},
@@ -301,17 +294,9 @@ function animate() {
 	C.fillText('x: ' + (mouseTicks.x.toString()[0] === '-' ? '' : ' ') + mouseTicks.x.toFixed(settings.decimalLength), settings.style.text.x, settings.style.text.y+settings.style.text.space);
 	C.fillText('y: ' + (mouseTicks.y.toString()[0] === '-' ? '' : ' ') + mouseTicks.y.toFixed(settings.decimalLength), settings.style.text.x, settings.style.text.y+settings.style.text.space*2);
 
-	// Saves the smooth mouse coordinates
-	mouse.previous.x = mouse.smooth.x;
-	mouse.previous.y = mouse.smooth.y;
-
-	// Updates the smooth mouse coordinates
-	mouse.smooth.x += (mouse.real.x-mouse.smooth.x)/settings.mouseEase;
-	mouse.smooth.y += (mouse.real.y-mouse.smooth.y)/settings.mouseEase;
-
-	// Updates the velocity of the mouse
-	mouse.velocity.x = mouse.smooth.x-mouse.previous.x;
-	mouse.velocity.y = mouse.smooth.y-mouse.previous.y;
+	// Updates the mouse's smooth coordinates and velocity
+	mouse.smooth.x += mouse.velocity.x = (mouse.real.x-mouse.smooth.x)/settings.mouseEase;
+	mouse.smooth.y += mouse.velocity.y = (mouse.real.y-mouse.smooth.y)/settings.mouseEase;
 
 	// Updates the graph's origin with the velocity if the mouse is down
 	if (mouse.down) {
@@ -355,16 +340,13 @@ onmouseup = () => {
 };
 
 onwheel = E => {
-	if (E.deltaY < 0) {
-		graph.origin.real.x += graph.origin.real.x*1.05-graph.origin.real.x;
-		graph.origin.real.y += graph.origin.real.y*1.05-graph.origin.real.y;
-		graph.tick.space.real.x *= 1.05;
-		graph.tick.space.real.y *= 1.05;
-	} else if (graph.tick.space.real.x > width/2/graph.border.tick.x/settings.zoomLimit && graph.tick.space.real.y > height/2/graph.border.tick.y/settings.zoomLimit) {
-		graph.origin.real.x += graph.origin.real.x*0.95-graph.origin.real.x;
-		graph.origin.real.y += graph.origin.real.y*0.95-graph.origin.real.y;
-		graph.tick.space.real.x *= 0.95;
-		graph.tick.space.real.y *= 0.95;
+	// If the mouse is scrolling up or the graph isn't fully zoomed in yet
+	if (E.deltaY < 0 || graph.tick.space.real.x > width/2/graph.border.tick.x/settings.zoomLimit && graph.tick.space.real.y > height/2/graph.border.tick.y/settings.zoomLimit) {
+		const increment = 1-(E.deltaY < 0 ? -1 : 1)*settings.zoomSpeed;
+		graph.origin.real.x += graph.origin.real.x*increment-graph.origin.real.x;
+		graph.origin.real.y += graph.origin.real.y*increment-graph.origin.real.y;
+		graph.tick.space.real.x *= increment;
+		graph.tick.space.real.y *= increment;
 	}
 };
 
@@ -393,8 +375,8 @@ Each line in the graph represents a function in the array \`settings.equations\`
 	document.title = 'Graphing Calculator';
 	onresize();
 
-	mouse.real.x = mouse.smooth.x = mouse.previous.x = graph.x;
-	mouse.real.y = mouse.smooth.y = mouse.previous.y = graph.y;
+	mouse.real.x = mouse.smooth.x = graph.x;
+	mouse.real.y = mouse.smooth.y = graph.y;
 
 	animate();
 };

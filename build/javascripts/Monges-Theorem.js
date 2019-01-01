@@ -15,56 +15,31 @@ const settings = {
 			'rgb(0, 255, 0)',
 			'rgb(0, 0, 255)'
 		]
-	}
+	},
+
+	mouseEase: 5,
+	circleEase: 5
 };
 
 const mouse = {
-	// The actual mouse coordinates
 	real: { x: null, y: null },
-
-	// The smooth version of the mouse coordinates
 	smooth: { x: null, y: null },
-
-	// The previous value of the smooth mouse coordinates
-	previous: { x: null, y: null },
-
-	// The velocity of the smooth mouse
 	velocity: { x: 0, y: 0 },
 
-	// If the mouse has selected a circle
+	// The mouse's selected circle
 	selected: null
 };
 
-const circles = [
-	// Large
-	{ rx: Math.random(), ry: Math.random(), radius: 100 },
+const circles = [{ radius: 100 }, { radius: 50 }, { radius: 25 }];
 
-	// Medium
-	{ rx: Math.random(), ry: Math.random(), radius: 50 },
-
-	// Small
-	{ rx: Math.random(), ry: Math.random(), radius: 25 }
-];
-
-// Makes all of the circles have an x and y getters that'll return their actual coordinates
+// Makes all of the circles have an x and y coordinates
 for (const circle of circles) {
-	Object.defineProperties(circle, {
-		x: {
-			get() {
-				return width*this.rx;
-			}
-		},
-
-		y: {
-			get() {
-				return height*this.ry;
-			}
-		}
-	});
+	circle.real = { x: null, y: null };
+	circle.smooth = { x: null, y: null };
 }
 
 // Finds the angle going from circle "a" to circle "b"
-const findAngle = (a, b) => Math.atan((circles[a].x-circles[b].x)/(circles[a].y-circles[b].y));
+const findAngle = (a, b) => Math.atan((circles[a].smooth.x-circles[b].smooth.x)/(circles[a].smooth.y-circles[b].smooth.y));
 
 // Calculates the contact point of the given angle and a circle's index
 const findTangent = (index, angle) => {
@@ -72,8 +47,8 @@ const findTangent = (index, angle) => {
 	const y = Math.sin(angle)*circles[index].radius;
 
 	return [
-		{ x: circles[index].x-x, y: circles[index].y+y },
-		{ x: circles[index].x+x, y: circles[index].y-y }
+		{ x: circles[index].smooth.x-x, y: circles[index].smooth.y+y },
+		{ x: circles[index].smooth.x+x, y: circles[index].smooth.y-y }
 	];
 };
 
@@ -81,7 +56,7 @@ const findTangent = (index, angle) => {
 const findContact = (a, b, angle) => {
 	a = circles[a];
 	b = circles[b];
-	const hypot = a.radius*Math.hypot(a.x-b.x, a.y-b.y)/(a.radius-b.radius)*(a.y < b.y ? -1 : 1);
+	const hypot = a.radius*Math.hypot(a.smooth.x-b.smooth.x, a.smooth.y-b.smooth.y)/(a.radius-b.radius)*(a.smooth.y < b.smooth.y ? -1 : 1);
 
 	return {
 		x: Math.sin(angle)*hypot,
@@ -91,8 +66,8 @@ const findContact = (a, b, angle) => {
 
 // Prevents a circle's coordinate from going off screen
 const limit = circle => {
-	circle.rx = Math.min(Math.max(circle.rx, (circle.radius+settings.style.outlineWidth/2)/width), (width-circle.radius-settings.style.outlineWidth/2)/width);
-	circle.ry = Math.min(Math.max(circle.ry, (circle.radius+settings.style.outlineWidth/2)/height), (height-circle.radius-settings.style.outlineWidth/2)/height);
+	circle.real.x = Math.min(Math.max(circle.real.x, circle.radius+settings.style.outlineWidth/2), width-circle.radius-settings.style.outlineWidth/2);
+	circle.real.y = Math.min(Math.max(circle.real.y, circle.radius+settings.style.outlineWidth/2), height-circle.radius-settings.style.outlineWidth/2);
 };
 
 // < Animation >
@@ -124,8 +99,8 @@ function animate() {
 		tangent[pair] = findTangent(pair[0], angles[pair]);
 		tangent[riap] = findTangent(riap[0], angles[pair]);
 		contact[pair] = {
-			x: circles[pair[0]].x-coordinates.x,
-			y: circles[pair[0]].y-coordinates.y
+			x: circles[pair[0]].smooth.x-coordinates.x,
+			y: circles[pair[0]].smooth.y-coordinates.y
 		};
 	}
 
@@ -166,7 +141,7 @@ function animate() {
 		C.lineWidth = settings.style.outlineWidth;
 		C.strokeStyle = 'black';
 		C.beginPath();
-		C.arc(circles[i].x, circles[i].y, circles[i].radius, 0, Math.PI*2);
+		C.arc(circles[i].smooth.x, circles[i].smooth.y, circles[i].radius, 0, Math.PI*2);
 		C.stroke();
 
 		// Circle
@@ -190,28 +165,28 @@ function animate() {
 	C.strokeStyle = settings.style.contactLineColor;
 	C.stroke();
 
-	// Saves the smooth mouse coordinates
-	mouse.previous.x = mouse.smooth.x;
-	mouse.previous.y = mouse.smooth.y;
+	// Updates the mouse's smooth coordinates and velocity
+	mouse.smooth.x += mouse.velocity.x = (mouse.real.x-mouse.smooth.x)/settings.mouseEase;
+	mouse.smooth.y += mouse.velocity.y = (mouse.real.y-mouse.smooth.y)/settings.mouseEase;
 
-	// Updates the smooth mouse coordinates to be closer to the real one
-	mouse.smooth.x += (mouse.real.x-mouse.smooth.x)/5;
-	mouse.smooth.y += (mouse.real.y-mouse.smooth.y)/5;
+	// Updates all circles' coordinates
+	for (const circle of circles) {
+		circle.smooth.x += (circle.real.x-circle.smooth.x)/settings.circleEase;
+		circle.smooth.y += (circle.real.y-circle.smooth.y)/settings.circleEase;
+	}
 
-	// Updates the velocity of the mouse
-	mouse.velocity.x = mouse.smooth.x-mouse.previous.x;
-	mouse.velocity.y = mouse.smooth.y-mouse.previous.y;
-
-	// Updates the coordinates of the selected circle
+	// Updates the coordinates of the selected circle to the mouse's coordinates
 	if (mouse.selected) {
 		const { circle, displace } = mouse.selected;
 
-		// Updates the selected circle's coordinates
-		circle.rx = (mouse.smooth.x+displace.x)/width;
-		circle.ry = (mouse.smooth.y+displace.y)/height;
-
-		// Limit the circle's coordinate so the mouse can't drag it out of the screen
-		limit(circle);
+		// Make the circle's real coordinates be the same as the mouse's with the displacement
+		circle.real.x = mouse.real.x+displace.x;
+		circle.real.y = mouse.real.y+displace.y;
+	} else {
+		// Make all circles go back inside the canvas when it's out of bounds
+		for (const circle of circles) {
+			limit(circle);
+		}
 	}
 }
 
@@ -223,13 +198,13 @@ onmousemove = E => {
 onmousedown = () => {
 	// Checks if the mouse has clicked inside a circle
 	for (const circle of circles) {
-		if (Math.hypot(mouse.smooth.x-circle.x, mouse.smooth.y-circle.y) <= circle.radius) {
+		if (Math.hypot(mouse.smooth.x-circle.smooth.x, mouse.smooth.y-circle.smooth.y) <= circle.radius) {
 			// Saves the selected circle and stops the loop
 			mouse.selected = {
 				circle,
 				displace: {
-					x: circle.x-mouse.smooth.x,
-					y: circle.y-mouse.smooth.y
+					x: circle.real.x-mouse.real.x,
+					y: circle.real.y-mouse.real.y
 				}
 			};
 
@@ -250,10 +225,7 @@ onresize = function() {
 	C.lineWidth = settings.style.lineWidth;
 	C.lineCap = 'round';
 
-	// This prevents the circles from clipping out of the screen
-	for (const circle of circles) {
-		limit(circle);
-	}
+	onmouseup();
 };
 
 onload = () => {
@@ -269,5 +241,12 @@ Each three circles' pairs of tangent lines will intersect each other. This resul
 
 	document.title = 'Monge\'s Theorem';
 	onresize();
+
+	// Put the circles somewhere in the canvas
+	for (const circle of circles) {
+		circle.real.x = circle.smooth.x = Math.floor(Math.random()*(width-circle.radius*2))+circle.radius;
+		circle.real.y = circle.smooth.y = Math.floor(Math.random()*(height-circle.radius*2))+circle.radius;
+	}
+
 	animate();
 };

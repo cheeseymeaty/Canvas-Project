@@ -5,12 +5,13 @@ const C = canvas.getContext('2d');
 let { width, height } = canvas;
 
 const settings = {
-	paused: true,
 	style: {
-		fontSize: 25,
 		dotSize: 1,
-		triangleLineWidth: 5
-	}
+		triangleLineWidth: 5,
+		font: '25px "Roboto Mono"'
+	},
+
+	paused: true
 };
 
 const keyboard = {
@@ -23,7 +24,7 @@ const triangle = {
 	length: 500
 };
 
-triangle.height = Math.sqrt(triangle.length**2-(triangle.length/2)**2);
+triangle.height = Math.sqrt(3)/2*triangle.length;
 triangle.vertex = [
 	// Top
 	{ x: 0, y: -triangle.height/2 },
@@ -67,23 +68,12 @@ function animate() {
 	C.clearRect(0, 0, width, height);
 
 	// Draws triangle from vertex to vertex
-	// / Top to Left
-	C.beginPath();
-	C.moveTo(width*triangle.rx+triangle.vertex[0].x, height*triangle.ry+triangle.vertex[0].y);
-	C.lineTo(width*triangle.rx+triangle.vertex[1].x, height*triangle.ry+triangle.vertex[1].y);
-	C.stroke();
-
-	// / Left to Right
-	C.beginPath();
-	C.moveTo(width*triangle.rx+triangle.vertex[1].x, height*triangle.ry+triangle.vertex[1].y);
-	C.lineTo(width*triangle.rx+triangle.vertex[2].x, height*triangle.ry+triangle.vertex[2].y);
-	C.stroke();
-
-	// / Right to Top
-	C.beginPath();
-	C.moveTo(width*triangle.rx+triangle.vertex[2].x, height*triangle.ry+triangle.vertex[2].y);
-	C.lineTo(width*triangle.rx+triangle.vertex[0].x, height*triangle.ry+triangle.vertex[0].y);
-	C.stroke();
+	for (let i = 0; i < 3; i++) {
+		C.beginPath();
+		C.moveTo(width*triangle.rx+triangle.vertex[i].x, height*triangle.ry+triangle.vertex[i].y);
+		C.lineTo(width*triangle.rx+triangle.vertex[(i+1)%3].x, height*triangle.ry+triangle.vertex[(i+1)%3].y);
+		C.stroke();
+	}
 
 	// Draws each dot
 	for (const point of dot.array) {
@@ -102,7 +92,7 @@ function animate() {
 	C.fillText(
 		dot.array.length, width*triangle.rx,
 		Math.max(
-			height*triangle.ry+triangle.height/2+settings.style.fontSize,
+			height*triangle.ry+triangle.height/2+parseInt(settings.style.font),
 			(height+height*triangle.ry+triangle.height/2)/2
 		)
 	);
@@ -156,7 +146,7 @@ onresize = function() {
 
 	C.lineWidth = settings.style.triangleLineWidth;
 	C.lineCap = 'round';
-	C.font = settings.style.fontSize + 'px "Roboto Mono"';
+	C.font = settings.style.font;
 	C.textBaseline = 'middle';
 	C.textAlign = 'center';
 };
