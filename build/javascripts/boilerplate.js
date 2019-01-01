@@ -4,22 +4,41 @@ const C = canvas.getContext('2d');
 
 let { width, height } = canvas;
 
-const settings = {};
+const settings = {
+	style: {
+
+	},
+
+	mouseEase: 5
+};
 
 const keyboard = {};
 
-const mouse = { x: null, y: null };
+const mouse = {
+	real: { x: null, y: null },
+	smooth: { x: null, y: null },
+	velocity: { x: null, y: null }
+};
 
 // < Animation >
 function animate() {
 	requestAnimationFrame(animate);
 	C.clearRect(0, 0, width, height);
+
 	C.fillText('boilerplate.js', 15, 15);
+	C.beginPath();
+	C.arc(mouse.smooth.x, mouse.smooth.y, 5, 0, Math.PI*2);
+	C.fill();
+
+	// Updates the mouse's smooth coordinates and velocity
+	mouse.smooth.x += mouse.velocity.x = (mouse.real.x-mouse.smooth.x)/settings.mouseEase;
+	mouse.smooth.y += mouse.velocity.y = (mouse.real.y-mouse.smooth.y)/settings.mouseEase;
+	console.log(mouse.smooth.x, mouse.smooth.y);
 }
 
 // < Events >
 onmousemove = E => {
-	[mouse.x, mouse.y] = [E.x, E.y];
+	[mouse.real.x, mouse.real.y] = [E.x, E.y];
 };
 
 onkeydown = E => {
