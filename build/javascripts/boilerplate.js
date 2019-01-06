@@ -33,7 +33,6 @@ function animate() {
 	// Updates the mouse's smooth coordinates and velocity
 	mouse.smooth.x += mouse.velocity.x = (mouse.real.x-mouse.smooth.x)/settings.mouseEase;
 	mouse.smooth.y += mouse.velocity.y = (mouse.real.y-mouse.smooth.y)/settings.mouseEase;
-	console.log(mouse.smooth.x, mouse.smooth.y);
 }
 
 // < Events >
